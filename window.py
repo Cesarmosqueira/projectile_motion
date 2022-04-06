@@ -46,7 +46,9 @@ class Window:
                     reference, 
                     int(ball.diameter*0.05))
 
-
+    def move_balls(self):
+        for ball in self.balls:
+            ball.on_update()
 
     def on_update(self, step, framerate):
         ang=math.radians(5)
@@ -68,6 +70,10 @@ class Window:
                     for b in self.balls:
                         b.angle -= ang
                     # print(f'-{ang} angle = {self.balls[0].angle}')
+                elif event.key == pygame.K_SPACE:
+                    if len(self.balls):
+                        self.balls[self.hover_ball].moving = True
+                        self.balls[self.hover_ball].load_launch_params(10)
 
         _delta = self.clock.tick(framerate)
         self.window.fill((164, 188, 255))

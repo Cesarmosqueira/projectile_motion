@@ -1,4 +1,7 @@
-from math import radians
+from math import radians, sin, cos
+
+STEP = 0.01
+
 class Ball:
     def __init__(self, **kwargs):
         # x: int, y: int,  angle: int, color: vec3
@@ -8,6 +11,34 @@ class Ball:
         self.color = (144, 41, 43) if 'color' not in kwargs else kwargs['color']
         self.diameter = 20 if 'diameter' not in kwargs else kwargs['diameter']
         self.hover = False
+        self.moving = False
+        self.time_moving = 0
+
+    def load_launch_params(self, speed):
+        self.speed = speed
+        self.starting_point = self.x, self.y
+        pass
+    
+
+
+    def on_update(self):
+        if not self.moving: return
+        self.time_moving += STEP
+
+
+        vx = cos(self.speed)
+        vy = sin(self.speed) + (0.981 * self.time_moving**2)/2
+        
+        self.x += vx
+        self.y += vy
+
+
+        
+
+        
+        pass
+
+      
 
 
 
