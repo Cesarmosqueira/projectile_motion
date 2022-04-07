@@ -22,7 +22,6 @@ class Ball:
     def __load_launch_params(self, speed):
         self.time_moving = 0
         self.speed = speed
-        self.starting_point = float(self.x), float(self.y)
         self.motion_path = []
     
     def on_update(self):
@@ -39,9 +38,8 @@ class Ball:
         self.x += vx
         self.y += vy * self.time_moving + (9.81 * -self.time_moving**2)/2
 
-        if self.y < self.starting_point[1]:
-            print(f'y = {self.y} old_y = {self.starting_point[1]}')
-            self.y = self.starting_point[1]
+        if self.y < 30:
+            self.y = 30
             self.moving = False
 
         if int(self.time_moving * 100) % 5 == 0:
