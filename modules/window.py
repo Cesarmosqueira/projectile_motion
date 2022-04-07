@@ -3,6 +3,8 @@ import math
 from typing import List
 from ball import Ball
 
+MAX_MASS = 300
+
 def draw_nice_rectangle(window, x,y,w,h, bg, border, shadow):
     pygame.draw.line(window, border, (x, y), (x + w , y), 5)
     pygame.draw.line(window, border, (x, y - 2), (x, y + h), 5)
@@ -82,6 +84,7 @@ class Modifier:
 
 V_XOFFSET = 23 
 R_XOFFSET = 17
+M_XOFFSET = 23
 
 class Window:
     def __init__(self, w, h):
@@ -93,11 +96,17 @@ class Window:
         self.balls = []
         self.hover_ball = 0
         self.velocity = 50
+        self.drag_coefficient = 47
+        self.air_density = 1.2
 
-        self.x_modifier = Modifier((10,10), "X: - ", 18, step=10)
-        self.y_modifier = Modifier((67,10), "Y: - ", 18, step=10)
-        self.v_modifier = Modifier((150,10), "V: - ", 20, step=1)
-        self.r_modifier = Modifier((240,10), "R: - ", 20, step=2)
+
+        self.x_modifier  = Modifier((10,10), "X: - ", 18, step=10)
+        self.y_modifier  = Modifier((67,10), "Y: - ", 18, step=10)
+        self.v_modifier  = Modifier((150,10), "V: - ", 20, step=1)
+        self.r_modifier  = Modifier((240,10), "R: - ", 20, step=2)
+        self.dc_modifier = Modifier((320,10), "C: - ", 20, step = 5)
+        self.mass_modifier = Modifier((400,10), "m: - ", 20, step = 5)
+        self.p_modifier = Modifier((500,10), "p: - ", 20, step = 0.2)
 
 
     def update_balls(self, balls:List[Ball]):
@@ -122,7 +131,7 @@ class Window:
         ref_y = math.sin(angle) * radius + y - 1
         return int(ref_x), self.height-int(ref_y)
 
-    def __update_mods(self, x_mod, y_mod, v_mod, r_mod):
+    def __update_mods(self, x_mod, y_mod, v_mod, r_mod, dc_mod, mass_mod, density_mod):
         if len(self.balls):
             if 0 <= self.balls[self.hover_ball].x + x_mod and \
                     self.balls[self.hover_ball].x + x_mod <= self.width:
@@ -131,28 +140,37 @@ class Window:
             if 0 <= self.balls[self.hover_ball].y + y_mod and \
                     self.balls[self.hover_ball].y + y_mod <= self.ceiling:
                 self.balls[self.hover_ball].y += y_mod
-
+             
+            if 0 <= self.balls[self.hover_ball].mass - mass_mod and \
+                    self.balls[self.hover_ball].mass - mass_mod <= MAX_MASS:
+                self.balls[self.hover_ball].mass -= mass_mod
 
             if 10 <= self.balls[self.hover_ball].diameter//2 + r_mod and \
                 self.balls[self.hover_ball].diameter//2 + r_mod <= 30:
                 self.balls[self.hover_ball].update_diameter(r_mod, 30)
-
+        if 0 <= self.air_density + density_mod and self.air_density + density_mod <= 5:
+            self.air_density += density_mod
+    
         if 50 <= self.velocity + v_mod and self.velocity + v_mod <= 80:
             self.velocity += v_mod
+        if 0 <= self.drag_coefficient + dc_mod and self.drag_coefficient + dc_mod <= 50:
+            self.drag_coefficient += dc_mod
 
     def draw_call(self):
         bg_color = (130,130,130)
-        # TODO:
-            # Coeficiente de resistencia (CD) 0,500
-            # Masa (kg) [0,140; 0,350]
-            # Ángulo de lanzamiento [20,0°; 70,0°]
-            # Densidad del aire (kg/m3) [1, 20]
         for ball in self.balls:
             reference = self.__get_reference_point((ball.x, ball.y), 
                     ball.angle, ball.diameter/2)
             pygame.draw.circle(self.window,
                                 ball.color if not ball.hover else (122,255,33),
                     [ball.x, self.height-ball.y], ball.diameter/2)
+
+            if ball.hover:
+                pygame.draw.circle(self.window,
+                                    ball.color,
+                        [ball.x, self.height-ball.y], ball.diameter/2, width=int(ball.mass*0.05))
+
+
 
             pygame.draw.line(self.window, (0,0,0),
                     (ball.x, self.height-ball.y), 
@@ -164,7 +182,7 @@ class Window:
             if len(ball.motion_path):
                 for p in ball.motion_path:
                     pygame.draw.circle(self.window, (235, 239, 18), \
-                            [p[0], self.height - p[1]], 1)
+                            [p[0], self.height - p[1]], 2)
 
         # nice neat top bar 
         draw_nice_rectangle(self.window, 0, 0, self.width, self.height*0.08, \
@@ -177,7 +195,11 @@ class Window:
         self.x_modifier.on_update(self.window, bg_color, value = f"{int(self.balls[self.hover_ball].x)}m")
         self.y_modifier.on_update(self.window, bg_color, value = f"{int(self.balls[self.hover_ball].y)}m")
         self.r_modifier.on_update(self.window, bg_color, value = f"{int(self.balls[self.hover_ball].diameter/2)}cm", r_offset=R_XOFFSET, x_offset=R_XOFFSET)
+        self.mass_modifier.on_update(self.window, bg_color, value = f"{MAX_MASS - int(self.balls[self.hover_ball].mass)}kg", r_offset=M_XOFFSET, x_offset= M_XOFFSET)
+
         self.v_modifier.on_update(self.window, bg_color, value = f"{self.velocity}m/s", r_offset=V_XOFFSET, x_offset=V_XOFFSET)
+        self.dc_modifier.on_update(self.window, bg_color, value = f"{self.drag_coefficient}c")
+        self.p_modifier.on_update(self.window, bg_color, value = f"{round(self.air_density,2)}d", r_offset=R_XOFFSET, x_offset=R_XOFFSET)
 
 
     def move_balls(self):
@@ -207,14 +229,18 @@ class Window:
                             b.angle += ang
                 elif event.key == pygame.K_SPACE:
                     if len(self.balls):
-                        self.balls[self.hover_ball].launch(self.velocity)
+                        self.balls[self.hover_ball].launch(self.velocity, \
+                                resistance_q=self.drag_coefficient/100, air_density=self.air_density)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x_mod = self.x_modifier.on_click(self.window, pygame.mouse.get_pos())
                 y_mod = self.y_modifier.on_click(self.window, pygame.mouse.get_pos())
                 v_mod = self.v_modifier.on_click(self.window, pygame.mouse.get_pos(), V_XOFFSET)
                 r_mod = self.r_modifier.on_click(self.window, pygame.mouse.get_pos(), R_XOFFSET)
-                self.__update_mods(x_mod, y_mod, v_mod, r_mod)
+                mass_mod = self.mass_modifier.on_click(self.window, pygame.mouse.get_pos(), M_XOFFSET)
+                dc_mod = self.dc_modifier.on_click(self.window, pygame.mouse.get_pos())
+                density_mod = self.p_modifier.on_click(self.window, pygame.mouse.get_pos(), x_offset=R_XOFFSET)
+                self.__update_mods(x_mod, y_mod, v_mod, r_mod, dc_mod, mass_mod, density_mod)
 
 
         _delta = self.clock.tick(framerate)

@@ -1,6 +1,6 @@
 from math import radians, sin, cos
 
-STEP = 0.01
+STEP = 0.005
 GRAVITY = 5
 
 class Ball:
@@ -20,7 +20,10 @@ class Ball:
         self.motion_path = []
         self.y = 32 + self.diameter//2
 
-    def launch(self, speed, parameter_range=(50,80), resistance_q = 0.2, air_density=1.20):
+    def launch(self, speed, **kwargs):
+        resistance_q = 0.47 if 'resistance_q' not in kwargs else kwargs['resistance_q']
+        air_density = 1.2 if 'air_density' not in kwargs else kwargs['air_density']
+        parameter_range = (50, 80) if 'parameter_range' not in kwargs else kwargs['parameter_range']
         self.moving = True
         # launch speedd range 2 - 10
         bot, top = parameter_range
@@ -32,7 +35,6 @@ class Ball:
         drag_coefficient =  (( resistance_q * air_density * (self.diameter/2)**2 ) / 2)/ self.mass
 
         self.__load_launch_params(cvt_speed, drag_coefficient)
-
         
 
     def update_diameter(self, mod, floor_level):
@@ -78,8 +80,6 @@ class Ball:
         if 0 <= self.x + dx and self.x + dx <= width:
             self.x += dx
         self.y += dy
-
-        print(f"{str(self.x)[:5]}\t{str(self.y)[:5]}")
 
         if self.y < self.__floor(floor_level):
             self.y = self.__floor(floor_level)
