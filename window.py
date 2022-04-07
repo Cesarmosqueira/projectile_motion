@@ -72,8 +72,7 @@ class Window:
                     # print(f'-{ang} angle = {self.balls[0].angle}')
                 elif event.key == pygame.K_SPACE:
                     if len(self.balls):
-                        self.balls[self.hover_ball].moving = True
-                        self.balls[self.hover_ball].load_launch_params(10)
+                        self.balls[self.hover_ball].launch(10)
 
         _delta = self.clock.tick(framerate)
         self.window.fill((164, 188, 255))

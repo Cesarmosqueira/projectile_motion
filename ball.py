@@ -14,31 +14,34 @@ class Ball:
         self.moving = False
         self.time_moving = 0
 
-    def load_launch_params(self, speed):
+    def launch(self, speed):
+        self.moving = True
+        self.__load_launch_params(speed)
+
+    def __load_launch_params(self, speed):
+        self.time_moving = 0
         self.speed = speed
-        self.starting_point = self.x, self.y
+        self.starting_point = float(self.x), float(self.y)
         pass
     
-
-
     def on_update(self):
+        # print(f"x = {self.x} y = {self.y}")
         if not self.moving: return
         self.time_moving += STEP
 
 
-        vx = cos(self.speed)
-        vy = sin(self.speed) + (0.981 * self.time_moving**2)/2
+        vx = cos(self.angle) * self.speed * 0.2
+        vy = sin(self.angle) * self.speed * 0.8
+
+        # print(f"vx = {vx}\nvy = {vy}\n")
+        
         
         self.x += vx
-        self.y += vy
+        self.y += vy * self.time_moving + (9.81 * -self.time_moving**2)/2
 
-
-        
-
-        
-        pass
-
-      
-
-
+        if self.y < self.starting_point[1]:
+            print(f'y = {self.y} old_y = {self.starting_point[1]}')
+            self.y = self.starting_point[1]
+            self.moving = False
+        return
 
