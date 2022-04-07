@@ -13,6 +13,7 @@ class Ball:
         self.hover = False
         self.moving = False
         self.time_moving = 0
+        self.motion_path = []
 
     def launch(self, speed):
         self.moving = True
@@ -22,7 +23,7 @@ class Ball:
         self.time_moving = 0
         self.speed = speed
         self.starting_point = float(self.x), float(self.y)
-        pass
+        self.motion_path = []
     
     def on_update(self):
         # print(f"x = {self.x} y = {self.y}")
@@ -35,7 +36,6 @@ class Ball:
 
         # print(f"vx = {vx}\nvy = {vy}\n")
         
-        
         self.x += vx
         self.y += vy * self.time_moving + (9.81 * -self.time_moving**2)/2
 
@@ -43,5 +43,8 @@ class Ball:
             print(f'y = {self.y} old_y = {self.starting_point[1]}')
             self.y = self.starting_point[1]
             self.moving = False
-        return
+
+        if int(self.time_moving * 100) % 5 == 0:
+            self.motion_path += [(self.x, self.y)]
+
 

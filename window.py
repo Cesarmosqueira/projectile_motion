@@ -45,6 +45,14 @@ class Window:
                     (ball.x, self.height-ball.y), 
                     reference, 
                     int(ball.diameter*0.05))
+            if ball.moving:
+                pygame.draw.circle(self.window, (235, 239, 18), \
+                        [ball.x, self.height - ball.y], ball.diameter*0.1)
+            if len(ball.motion_path):
+                for p in ball.motion_path:
+                    pygame.draw.circle(self.window, (235, 239, 18), \
+                            [p[0], self.height - p[1]], 1)
+
 
     def move_balls(self):
         for ball in self.balls:
