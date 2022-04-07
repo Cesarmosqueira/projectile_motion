@@ -1,5 +1,7 @@
-from window import Window
-from ball import Ball
+import sys
+sys.path.append('modules/')
+from window import Window # pylint: disable=(import-error)
+from ball import Ball # pylint: disable=(import-error)
 
 
 window = Window(600, 600)
@@ -14,6 +16,3 @@ while window.on_update(15, 60):
     pass
 
 window.close()
-            
-
-
