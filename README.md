@@ -1,8 +1,9 @@
 # Projectile Motion Simulator
 ## UPC - CC51
-> Note: `pip3 install -r requirements.txt`
-> 
-> Exec: `python3 main.py`
+  ```sh
+  pip3 install -r requirements.txt
+  python3 main.py
+  ```
 
 Simple [Pygame](https://github.com/pygame/pygame) interface to simulate proyectile motion.
 
