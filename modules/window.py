@@ -92,7 +92,7 @@ class Window:
         self.clock = pygame.time.Clock()
         self.balls = []
         self.hover_ball = 0
-        self.velocity = 20
+        self.velocity = 50
 
         self.x_modifier = Modifier((10,10), "X: - ", 18, step=10)
         self.y_modifier = Modifier((67,10), "Y: - ", 18, step=10)
@@ -135,13 +135,13 @@ class Window:
 
             if 10 <= self.balls[self.hover_ball].diameter//2 + r_mod and \
                 self.balls[self.hover_ball].diameter//2 + r_mod <= 30:
-                self.balls[self.hover_ball].diameter += r_mod
+                self.balls[self.hover_ball].update_diameter(r_mod, 30)
 
-        self.velocity += v_mod
+        if 50 <= self.velocity + v_mod and self.velocity + v_mod <= 80:
+            self.velocity += v_mod
 
     def draw_call(self):
         bg_color = (130,130,130)
-
         # TODO:
             # First implement in `ball.py`
             # Coeficiente de resistencia (CD) 0,500
@@ -160,7 +160,7 @@ class Window:
                     reference, 
                     int(ball.diameter*0.05))
             if ball.moving:
-                pygame.draw.circle(self.window, (235, 239, 18), \
+                pygame.draw.circle(self.window, (256-235, 256-239, 256-18), \
                         [ball.x, self.height - ball.y], ball.diameter*0.1)
             if len(ball.motion_path):
                 for p in ball.motion_path:
@@ -169,6 +169,9 @@ class Window:
 
         # nice neat top bar 
         draw_nice_rectangle(self.window, 0, 0, self.width, self.height*0.08, \
+                bg_color, (150, 150, 150), (50, 50, 50))
+
+        draw_nice_rectangle(self.window, 0, self.height-30, self.width, 30, \
                 bg_color, (150, 150, 150), (50, 50, 50))
 
         # modifiers inside bar
@@ -200,11 +203,11 @@ class Window:
                 elif event.key == pygame.K_UP:
                     for b in self.balls:
                         if not b.moving:
-                            b.angle += ang
+                            b.angle -= ang
                 elif event.key == pygame.K_DOWN:
                     for b in self.balls:
                         if not b.moving:
-                            b.angle -= ang
+                            b.angle += ang
                 elif event.key == pygame.K_SPACE:
                     if len(self.balls):
                         self.balls[self.hover_ball].launch(self.velocity)
