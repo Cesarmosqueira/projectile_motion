@@ -3,8 +3,6 @@ import math
 from typing import List
 from ball import Ball
 
-# def button(screen, position, text):
-
 def draw_nice_rectangle(window, x,y,w,h, bg, border, shadow):
     pygame.draw.line(window, border, (x, y), (x + w , y), 5)
     pygame.draw.line(window, border, (x, y - 2), (x, y + h), 5)
@@ -43,6 +41,8 @@ class Button:
         return window.blit(self.text_render, (self.x + x_offset, self.y))
 
 class Modifier:
+    # Contains two buttons to modify a value up and down
+    # Contains a label showing variable name and its value
     def __init__(self, pos, text, fontsize, **kwargs):
         self.label = Button(pos, text, fontsize)
         step = 5 if 'step' not in kwargs else kwargs['step']
@@ -101,10 +101,12 @@ class Window:
 
 
     def update_balls(self, balls:List[Ball]):
+        # Receive ball array from main module
         self.balls = balls
         self.__focus_ball(0)
 
     def __focus_ball(self, dir):
+        # Changes ball being focused
         if len(self.balls) == 0: return
         self.balls[self.hover_ball].hover = False
         if 0 <= self.hover_ball + dir \
@@ -114,10 +116,12 @@ class Window:
         self.balls[self.hover_ball].hover = True
 
     def __get_reference_point(self, center, angle, radius):
+        # Line inside circles
         x, y = center
         ref_x = math.cos(angle) * radius + x - 1
         ref_y = math.sin(angle) * radius + y - 1
         return int(ref_x), self.height-int(ref_y)
+
     def __update_mods(self, x_mod, y_mod, v_mod, r_mod):
         if len(self.balls):
             if 0 <= self.balls[self.hover_ball].x + x_mod and \
@@ -134,19 +138,16 @@ class Window:
                 self.balls[self.hover_ball].diameter += r_mod
 
         self.velocity += v_mod
-            
-        pass
-    
 
     def draw_call(self):
         bg_color = (130,130,130)
-        # Coeficiente de resistencia (CD) 0,500
-        # Masa (kg) [0,140; 0,350]
-        # Ángulo de lanzamiento [20,0°; 70,0°]
-        # Densidad del aire (kg/m3) [1, 20]
 
-    
-
+        # TODO:
+            # First implement in `ball.py`
+            # Coeficiente de resistencia (CD) 0,500
+            # Masa (kg) [0,140; 0,350]
+            # Ángulo de lanzamiento [20,0°; 70,0°]
+            # Densidad del aire (kg/m3) [1, 20]
         for ball in self.balls:
             reference = self.__get_reference_point((ball.x, ball.y), 
                     ball.angle, ball.diameter/2)
@@ -194,19 +195,20 @@ class Window:
                     self.__focus_ball(-1)
                 elif event.key == pygame.K_RIGHT:
                     self.__focus_ball(1)
+                # TODO:
+                    # move this part to `on_click`
                 elif event.key == pygame.K_UP:
                     for b in self.balls:
                         if not b.moving:
                             b.angle += ang
-                    # print(f'+{ang} angle = {self.balls[0].angle}')
                 elif event.key == pygame.K_DOWN:
                     for b in self.balls:
                         if not b.moving:
                             b.angle -= ang
-                    # print(f'-{ang} angle = {self.balls[0].angle}')
                 elif event.key == pygame.K_SPACE:
                     if len(self.balls):
                         self.balls[self.hover_ball].launch(self.velocity)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x_mod = self.x_modifier.on_click(self.window, pygame.mouse.get_pos())
                 y_mod = self.y_modifier.on_click(self.window, pygame.mouse.get_pos())
