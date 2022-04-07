@@ -99,7 +99,6 @@ class Window:
         self.drag_coefficient = 47
         self.air_density = 1.2
 
-
         self.x_modifier  = Modifier((10,10), "X: - ", 18, step=10)
         self.y_modifier  = Modifier((67,10), "Y: - ", 18, step=10)
         self.v_modifier  = Modifier((150,10), "V: - ", 20, step=1)
