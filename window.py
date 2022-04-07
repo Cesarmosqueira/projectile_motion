@@ -3,6 +3,30 @@ import math
 from typing import List
 from ball import Ball
 
+# def button(screen, position, text):
+
+class Button:
+    def __init__(self, position, text):
+        self.text = text
+        self.font = pygame.font.SysFont("Arial", 50)
+        self.text_render = self.font.render(self.text, 1, (255, 0, 0))
+        self.x, self.y, self.w , self.h = self.text_render.get_rect()
+        self.x, self.y = position
+
+    def on_update(self, window):
+        self.text_render = self.font.render(self.text, 1, (255, 0, 0))
+        x,y,w,h = self.x, self.y, self.w , self.h
+        pygame.draw.line(window, (150, 150, 150), (x, y), (x + w , y), 5)
+        pygame.draw.line(window, (150, 150, 150), (x, y - 2), (x, y + h), 5)
+        pygame.draw.line(window, (50, 50, 50), (x, y + h), (x + w , y + h), 5)
+        pygame.draw.line(window, (50, 50, 50), (x + w , y+h), [x + w , y], 5)
+        pygame.draw.rect(window, (100, 100, 100), (x, y, w , h))
+        return window.blit(self.text_render, (x, y))
+
+    def blit(self, window):
+        return window.blit(self.text_render, (self.x, self.y))
+
+
 class Window:
     def __init__(self, w, h):
         pygame.init()
@@ -11,6 +35,8 @@ class Window:
         self.clock = pygame.time.Clock()
         self.balls = []
         self.hover_ball = 0
+        self.b1 = Button((400, 300), "Quit")
+        self.b2 = Button((500, 300), "Start")
 
 
     def update_balls(self, balls:List[Ball]):
@@ -34,6 +60,14 @@ class Window:
 
 
     def draw_call(self):
+        # nice neat top bar 
+
+        # buttons for top bar
+        self.b1.on_update(self.window)
+        self.b2.on_update(self.window)
+        
+        # labels for top bar
+
         for ball in self.balls:
             reference = self.__get_reference_point((ball.x, ball.y), 
                     ball.angle, ball.diameter/2)
@@ -81,6 +115,11 @@ class Window:
                 elif event.key == pygame.K_SPACE:
                     if len(self.balls):
                         self.balls[self.hover_ball].launch(10)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.b1.blit(self.window).collidepoint(pygame.mouse.get_pos()):
+                    print('quit pressed')
+                elif self.b2.blit(self.window).collidepoint(pygame.mouse.get_pos()):
+                    print('start pressed')
 
         _delta = self.clock.tick(framerate)
         self.window.fill((164, 188, 255))
