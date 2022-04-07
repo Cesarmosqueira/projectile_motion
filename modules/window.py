@@ -143,7 +143,6 @@ class Window:
     def draw_call(self):
         bg_color = (130,130,130)
         # TODO:
-            # First implement in `ball.py`
             # Coeficiente de resistencia (CD) 0,500
             # Masa (kg) [0,140; 0,350]
             # Ángulo de lanzamiento [20,0°; 70,0°]
@@ -198,8 +197,6 @@ class Window:
                     self.__focus_ball(-1)
                 elif event.key == pygame.K_RIGHT:
                     self.__focus_ball(1)
-                # TODO:
-                    # move this part to `on_click`
                 elif event.key == pygame.K_UP:
                     for b in self.balls:
                         if not b.moving:
