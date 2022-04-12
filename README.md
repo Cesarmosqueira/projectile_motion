@@ -1,6 +1,8 @@
 # Projectile Motion Simulator
 ## UPC - CC51
   ```sh
+  git clone https://github.com/Cesarmosqueira/projectile_motion.git
+  projectile_motion
   pip3 install -r requirements.txt
   python3 main.py
   ```
