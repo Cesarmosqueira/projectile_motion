@@ -8,8 +8,8 @@
 Simple [Pygame](https://github.com/pygame/pygame) interface to simulate proyectile motion.
 
 
-- <kbd>LEFT</kbd> <kbd>RIGHT</kbd> Focus different balls
-- <kbd>LEFT</kbd> <kbd>RIGHT</kbd> Change angle
+- <kbd>←</kbd> <kbd>→</kbd> Focus different balls
+- <kbd>↑</kbd> <kbd>↓</kbd> Change angle
 - <kbd>Space</kbd> Execute motion
 
 
